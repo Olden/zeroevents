@@ -75,7 +75,7 @@ class EventService
         $poll = new \ZMQPoll;
         $readable = $writable = [];
         foreach ($this->listen as $socket) {
-            $poll->add($socket, \ZMQ::POLL_IN);
+            $poll->add($socket->lowLevelSocket(), \ZMQ::POLL_IN);
         }
         $processing = true;
         Event::listen('zeroevents.service.stop', function () use (&$processing) {

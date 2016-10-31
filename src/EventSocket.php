@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Event;
  *
  * @package ZeroEvents
  */
-class EventSocket extends \ZMQSocket
+class EventSocket extends ZMQSocketProxy
 {
     /**
      * Send/wait confirmation after sending/receiving message
