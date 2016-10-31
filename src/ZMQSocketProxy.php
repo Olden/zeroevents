@@ -25,6 +25,6 @@ class ZMQSocketProxy
 
     public function __call($name, $parameters)
     {
-        return call_user_func_array([$this, $name], $parameters);
+        return call_user_func_array([$this->socket, $name], $parameters);
     }
 }
