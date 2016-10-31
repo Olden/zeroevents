@@ -23,7 +23,7 @@ class EventService
      */
     public function listen(EventListener $listener)
     {
-        $this->listen[] = $listener->socket();
+        $this->listen[spl_object_hash($listener->socket()->baseSocket())] = $listener->socket();
 
         return $this;
     }
@@ -75,7 +75,7 @@ class EventService
         $poll = new \ZMQPoll;
         $readable = $writable = [];
         foreach ($this->listen as $socket) {
-            $poll->add($socket->lowLevelSocket(), \ZMQ::POLL_IN);
+            $poll->add($socket->baseSocket(), \ZMQ::POLL_IN);
         }
         $processing = true;
         Event::listen('zeroevents.service.stop', function () use (&$processing) {
@@ -85,7 +85,7 @@ class EventService
             try {
                 $poll->poll($readable, $writable, $this->pollTimeout);
                 foreach ($readable as $socket) {
-                    $socket->pullAndFire();
+                    $this->listen[spl_object_hash($socket)]->pullAndFire();
                 }
             } catch (\ZMQPollException $ex) {
                 if ($ex->getCode() == 4) { //  4 == EINTR, interrupted system call

@@ -18,7 +18,7 @@ class ZMQSocketProxy
     /**
      * @return \ZMQSocket
      */
-    public function lowLevelSocket()
+    public function baseSocket()
     {
         return $this->socket;
     }
