@@ -32,7 +32,7 @@ class EventSocketTest extends \PHPUnit_Framework_TestCase
 
     public function testInstance()
     {
-        $this->assertInstanceOf('ZMQSocket', $this->socket());
+        $this->assertInstanceOf('ZeroEvents\ZMQSocketProxy', $this->socket());
     }
 
     public function testEncode()
@@ -97,8 +97,8 @@ class EventSocketTest extends \PHPUnit_Framework_TestCase
         }
 
         $socket = $this->socket();
-        $socket->connect($dsn)
-            ->push('request.event', ['source', 'parent']);
+        $socket->connect($dsn);
+        $socket->push('request.event', ['source', 'parent']);
 
         $this->assertSame(
             [
@@ -126,15 +126,15 @@ class EventSocketTest extends \PHPUnit_Framework_TestCase
         if (!$pid = pcntl_fork()) {
             $socket = $this->socket();
             $socket->bind($dsn);
-            $socket->confirmed(true)
-                ->pull();
+            $socket->confirmed(true);
+            $socket->pull();
             exit;
         }
 
-        $message = $this->socket()
-            ->connect($dsn)
-            ->confirmed(true)
-            ->push('request.event', ['source', 'parent']);
+        $socket = $this->socket();
+        $socket->connect($dsn);
+        $socket->confirmed(true);
+        $message = $socket->push('request.event', ['source', 'parent']);
 
         $this->assertSame(
             [
@@ -158,15 +158,15 @@ class EventSocketTest extends \PHPUnit_Framework_TestCase
         if (!$pid = pcntl_fork()) {
             $socket = $this->socket(\ZMQ::SOCKET_ROUTER);
             $socket->bind($dsn);
-            $socket->confirmed(true)
-                ->pull();
+            $socket->confirmed(true);
+            $socket->pull();
             exit;
         }
 
-        $message = $this->socket(\ZMQ::SOCKET_DEALER)
-            ->connect($dsn)
-            ->confirmed(true)
-            ->push('request.event', ['source', 'parent']);
+        $socket = $this->socket(\ZMQ::SOCKET_DEALER);
+        $socket->connect($dsn);
+        $socket->confirmed(true);
+        $message = $socket->push('request.event', ['source', 'parent']);
 
         $this->assertSame(
             [
@@ -195,8 +195,8 @@ class EventSocketTest extends \PHPUnit_Framework_TestCase
         }
 
         $socket = $this->socket();
-        $socket->connect($dsn)
-            ->push('request.event', ['source', 'parent']);
+        $socket->connect($dsn);
+        $socket->push('request.event', ['source', 'parent']);
 
         $event = null;
         Event::listen('response.event', function () use (&$event) {
@@ -269,8 +269,8 @@ class EventSocketTest extends \PHPUnit_Framework_TestCase
         }
 
         $socket = $this->socket();
-        $socket->connect($dsn)
-            ->push('request.event', ['source', 'parent']);
+        $socket->connect($dsn);
+        $socket->push('request.event', ['source', 'parent']);
 
         $event = $socket->pull();
 
